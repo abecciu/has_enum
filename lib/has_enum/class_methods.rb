@@ -31,7 +31,8 @@ module HasEnum::ClassMethods
 
   def has_enum(*params)
     options = params.extract_options!
-    options.assert_valid_keys(:query_methods, :scopes, :presence, :multiple)
+    options.assert_valid_keys(:query_methods, :scopes, :presence, :multiple,
+                              :constants)
 
     raise ArgumentError, "Empty arguments list for has_enum call" if params.empty?
 
@@ -68,6 +69,10 @@ module HasEnum::ClassMethods
            self.send(attribute) == val.to_s
         end
       end if options[:query_methods] != false
+
+      values.each do |val|
+        const_set "#{attribute}_#{val}".upcase, val
+      end if options[:constants] != false
 
       if options[:multiple]
         define_method "human_#{attribute}" do
