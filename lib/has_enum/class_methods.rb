@@ -102,7 +102,7 @@ module HasEnum::ClassMethods
 
 
   def human_enums
-    @human_enums ||= enums.keys.inject HashWithIndifferentAccess.new do | hash, enum |
+    enums.keys.inject HashWithIndifferentAccess.new do | hash, enum |
       hash[enum] = human_enum_values enum
       hash
     end
