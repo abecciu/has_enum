@@ -1,10 +1,5 @@
 module HasEnum::ClassMethods
 
-  def enums
-    read_inheritable_attribute(:enums) ||
-      write_inheritable_attribute(:enums, HashWithIndifferentAccess.new)
-  end
-
   def enum_values(attribute)
     enums[attribute]
   end
@@ -14,7 +9,7 @@ module HasEnum::ClassMethods
   end
 
   def has_multiple_enum?(enum)
-    has_enum?(enum) && serialized_attributes[enum.to_s] == Array
+    has_enum?(enum) && serialized_attributes[enum.to_s].try(:object_class) == Array
   end
 
   def has_enums
@@ -26,12 +21,12 @@ module HasEnum::ClassMethods
           has_enum column_name
         end
       end
-    end
+    end if table_exists?
   end
 
   def has_enum(*params)
     options = params.extract_options!
-    options.assert_valid_keys(:query_methods, :scopes, :presence, :multiple)
+    options.assert_valid_keys(:query_methods, :scopes, :presence, :multiple, :validates)
 
     raise ArgumentError, "Empty arguments list for has_enum call" if params.empty?
 
@@ -54,7 +49,7 @@ module HasEnum::ClassMethods
       if options[:multiple]
         serialize attribute, Array
       else
-        validates attribute, :inclusion => { :in => values + [nil]}
+        validates attribute, :inclusion => { :in => values + [nil]} unless options[:validates] == false
       end
 
       validates attribute, :presence => options[:presence] if options[:presence]

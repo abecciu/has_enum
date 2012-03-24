@@ -44,8 +44,8 @@ describe HasEnum do
 
   it "should have has_enum? and has_multiple_enum? methods" do
     TestModel.should be_has_enum(:state)
-    TestModel.should_not be_has_enum(:some_attribute)
     TestModel.should be_has_multiple_enum(:speed)
+    TestModel.should_not be_has_enum(:some_attribute)
     TestModel.should_not be_has_multiple_enum(:status)
   end
 
@@ -83,7 +83,7 @@ describe HasEnum do
     AnotherModel.should_not be_has_multiple_enum(:size)
     AnotherModel.should     be_has_enum(:size)
 
-    AnotherModel.should_not be_has_enum(:status)
+    AnotherModel.should     be_has_enum(:status)
   end
 
   describe "category enum" do
@@ -166,7 +166,7 @@ describe HasEnum do
       model.color = 'red'
       model.save
 
-      model2 = model.clone
+      model2 = model.dup
       model2.color = :blue
       model2.save
 
@@ -197,6 +197,11 @@ describe HasEnum do
       %w(small medium large).each do |value|
         model.should_not respond_to(:"size_#{value}?")
       end
+    end
+
+    it "should accept not enum values" do
+      model.size = 'stuff'
+      model.should be_valid
     end
   end
 
